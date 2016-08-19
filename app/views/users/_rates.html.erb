@@ -3,7 +3,8 @@
 
 <div id="rates">
   <p>
-    <%= link_to l(:label_new_rate), new_rate_path, class: 'icon icon-add' %>
+    <%= link_to l(:label_new_rate), new_user_rate_path(@user),
+        remote: true, class: 'icon icon-add' %>
   </p>
 
   <% @rates = Rate.history_for_user(@user, "#{Rate.table_name}.date_in_effect desc") %>

@@ -12,6 +12,7 @@ class Rate < ActiveRecord::Base
   after_save :update_time_entry_cost_cache
   before_destroy :unlocked?
   after_destroy :update_time_entry_cost_cache
+  before_validation :fill_date
 
   def self.history_for_user(user, order)
     includes(:project).where(user_id: user).order(order)
@@ -35,6 +36,10 @@ class Rate < ActiveRecord::Base
 
   def update_time_entry_cost_cache
     TimeEntry.update_cost_cache(user, project)
+  end
+
+  def fill_date
+    self.date_in_effect = Date.today if new_record?
   end
 
   # API to find the Rate for a +user+ on a +project+ at a +date+

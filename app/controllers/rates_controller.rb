@@ -28,10 +28,11 @@ class RatesController < ApplicationController
   end
 
   def new
-    @rate = Rate.new(:user_id => @user.id)
+    @rate = Rate.new(user_id: @user.id)
 
     respond_to do |format|
-      format.html # new.html.erb
+      format.html
+      format.js
       format.xml  { render :xml => @rate }
     end
   end
@@ -41,25 +42,22 @@ class RatesController < ApplicationController
   end
 
   def create
-    logger.info "Create"
     @rate = Rate.new(rate_params)
 
+    @rate.save
+
     respond_to do |format|
-      if @rate.save
-        format.html {
-          flash[:notice] = 'Rate was successfully created.'
-          redirect_back_or_default(rates_url(:user_id => @rate.user_id))
-        }
-        format.xml  { render :xml => @rate, :status => :created, :location => @rate }
-        format.js { render :action => 'create.js.rjs'}
-      else
-        logger.error "errors: #{@rate.errors}"
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @rate.errors, :status => :unprocessable_entity }
-        format.js {
-          flash.now[:error] = 'Error creating a new Rate.'
-          render :action => 'create_error.js.rjs'
-        }
+      format.html do
+        if @rate.valid?
+          redirect_to user_rates_path(@rate.user)
+        else
+          render :new
+        end
+      end
+      format.js do
+        if @rate.valid?
+        else
+        end
       end
     end
   end

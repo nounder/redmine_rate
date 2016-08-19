@@ -1,37 +1,13 @@
-<%= form_for(@rate) do |f| %>
-<table class="list">
-	<thead>
-	  <th style="width:15%"><%= l(:label_date) %></th>
-	  <th><%= l(:label_project) %></th>
-	  <th style="width:15%"><%= l(:label_rate) %></th>
-	  <th style="width:5%"></th>
-	</thead>
-	<tbody>
-	<tr class="odd">
-      <td>
-        <%= f.text_field "date_in_effect", :size => 10  %><%= calendar_for('rate_date_in_effect') %>
-      </td>
-      <td>
+<fieldset class="box tabular">
+  <p>
+    <%= f.label :project_id %>
+    <%= f.select :project_id,
+        project_options_for_select_with_selected(Project.active, @rate.project) %>
+  </p>
+  <p>
+    <%= f.label :amount, value: l(:label_rate) %>
+    <%= f.text_field :amount, size: 10 %>
+  </p>
+</fieldset>
 
-       <%= # TODO: move to controller once a hook is in place for the Admin panel
-          projects = Project.where(status: Project::STATUS_ACTIVE)
-
-          select_tag("rate[project_id]", project_options_for_select_with_selected(projects, @rate.project))
-        %>
-      </td>
-      <td align="right">
-        <%= l(:rate_label_currency) %> <%= f.text_field "amount", :size => 10  %>
-      </td>
-      <td align="center">
-        <%= f.hidden_field "user_id" %>
-        <%= hidden_field_tag "back_url", @back_url %>
-        <% if @rate.unlocked? %>
-        <%= submit_tag((@rate.new_record? ? l(:button_add) : l(:button_update)), :class => 'button-small')-%>
-        <% else %>
-        <%= image_tag('locked.png') %>
-        <% end %>
-      </td>
-	</tr>
-	</tbody>
-</table>
-<% end %>
+<%= f.hidden_field :user_id %>

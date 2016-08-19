@@ -1,5 +1,6 @@
 <div class="contextual">
-  <%= link_to l(:label_new_rate), new_rate_path, class: 'icon icon-add' %>
+  <%= link_to l(:label_new_rate), new_user_rate_path(@user),
+      remote: true, class: 'icon icon-add' %>
 </div>
 
 <h2><%= l(:label_user_rates, value: link_to_user(@user)).html_safe %></h2>
