@@ -10,16 +10,15 @@ class RatesController < ApplicationController
   helper :sort
 
   before_filter :permit_params
-  before_filter :require_admin
-  before_filter :require_user_id, :only => [:index, :new]
-  before_filter :set_back_url
-  skip_before_filter  :verify_authenticity_token
+  before_filter :require_admin, only: [:edit, :update, :destroy]
+  before_filter :find_user, only: [:index, :new]
+
 
   def index
     sort_init '#{Rate.table_name}.date_in_effect', 'desc'
     sort_update SORT_OPTIONS
 
-    @rates = Rate.history_for_user(@user, sort_clause)
+    @rates = Rate.visible.where(user_id: @user.id).order(sort_clause)
 
     respond_to do |format|
       format.html { render :action => 'index', :layout => !request.xhr?}
@@ -105,40 +104,12 @@ class RatesController < ApplicationController
     params[:rate]
   end
 
-  def require_user_id
-    begin
-      @user = User.find(params[:user_id])
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        format.html { redirect_to(home_url) }
-        format.xml  { render :xml => "User not found", :status => :not_found }
-      end
-    end
+  def find_user
+    @user = User.find(params[:user_id])
   end
 
   def set_back_url
     @back_url = params[:back_url]
     @back_url
-  end
-
-  # Override defination from ApplicationController to make sure it follows a
-  # whitelist
-  def redirect_back_or_default(default)
-    whitelist = %r{(rates|/users/edit)}
-
-    back_url = CGI.unescape(params[:back_url].to_s)
-    if !back_url.blank?
-      begin
-        uri = URI.parse(back_url)
-        if uri.path && uri.path.match(whitelist)
-          super
-          return
-        end
-      rescue URI::InvalidURIError
-        # redirect to default
-        logger.debug("Invalid URI sent to redirect_back_or_default: " + params[:back_url].inspect)
-      end
-    end
-    redirect_to default
   end
 end
