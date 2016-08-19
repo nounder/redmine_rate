@@ -1,5 +1,8 @@
 module RedmineRate
   class Hook < Redmine::Hook::ViewListener
+    render_on :view_account_left_bottom,
+              partial: 'hooks/redmine_rate/view_account_left_bottom'
+
     def view_layouts_base_html_head(context={})
       return content_tag(:style, "#admin-menu a.rate-caches { background-image: url('.'); }", :type => 'text/css')
     end
