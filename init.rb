@@ -18,6 +18,3 @@ Redmine::Plugin.register :redmine_rate do
 end
 
 RedmineRate.install
-
-ApplicationController.send(:include, RateHelper)
-ApplicationController.send(:helper, :rate)

@@ -1,7 +1,13 @@
 class RatesController < ApplicationController
+  include SortHelper
+
+  SORT_OPTIONS = {
+    'date_in_effect' => "#{Rate.table_name}.date_in_effect",
+    'project_id' => "#{Project.table_name}.name"
+  }
+
   helper :users
   helper :sort
-  include SortHelper
 
   before_filter :permit_params
   before_filter :require_admin
@@ -9,11 +15,9 @@ class RatesController < ApplicationController
   before_filter :set_back_url
   skip_before_filter  :verify_authenticity_token
 
-  ValidSortOptions = {'date_in_effect' => "#{Rate.table_name}.date_in_effect", 'project_id' => "#{Project.table_name}.name"}
-
   def index
-    sort_init "#{Rate.table_name}.date_in_effect", "desc"
-    sort_update ValidSortOptions
+    sort_init '#{Rate.table_name}.date_in_effect', 'desc'
+    sort_update SORT_OPTIONS
 
     @rates = Rate.history_for_user(@user, sort_clause)
 

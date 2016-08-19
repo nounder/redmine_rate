@@ -1,3 +1,6 @@
+<% sort_init "#{Rate.table_name}.date_in_effect", "desc"
+   sort_update RatesController::SORT_OPTIONS %>
+
 <div id="rates">
   <p>
     <%= link_to l(:label_new_rate), new_rate_path, class: 'icon icon-add' %>
