@@ -11,7 +11,8 @@ class RatesController < ApplicationController
   helper :sort
 
   before_filter :require_admin, only: [:edit, :update, :destroy]
-  before_filter :check_permissions
+  before_filter :require_view_permission
+  before_filter :require_edit_permission, only: [:new, :create]
   before_filter :permit_params
   before_filter :find_user, only: [:index, :new]
 
@@ -61,11 +62,7 @@ class RatesController < ApplicationController
           render :new
         end
       end
-      format.js do
-        if @rate.valid?
-        else
-        end
-      end
+      format.js
     end
   end
 
@@ -102,8 +99,12 @@ class RatesController < ApplicationController
 
   private
 
-  def check_permissions
+  def require_view_permission
     render_403 unless User.current.allowed_to_globally?(:view_rates)
+  end
+
+  def require_edit_permission
+    render_403 unless User.current.allowed_to_globally?(:edit_rates)
   end
 
   def permit_params
