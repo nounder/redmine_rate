@@ -23,15 +23,6 @@ class RatesController < ApplicationController
     end
   end
 
-  def show
-    @rate = Rate.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @rate }
-    end
-  end
-
   def new
     @rate = Rate.new(:user_id => @user.id)
 
