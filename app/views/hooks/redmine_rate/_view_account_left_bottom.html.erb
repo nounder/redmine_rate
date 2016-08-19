@@ -1,3 +1,3 @@
-<% if User.current.allowed_to_globally?(:view_rate) %>
+<% if User.current.allowed_to_globally?(:view_rate) and Rate.for(@user).present? %>
 <h3><%= link_to l(:label_rates), user_rates_path(@user) %></h3>
 <% end %>

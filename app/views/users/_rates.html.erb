@@ -7,7 +7,7 @@
         remote: true, class: 'icon icon-add' %>
   </p>
 
-  <% @rates = Rate.history_for_user(@user, "#{Rate.table_name}.date_in_effect desc") %>
+  <% @rates = Rate.visible.recently.includes(:project).where(user_id: @user.id) %>
 
   <%= render partial: 'rates/list' %>
 </div>
