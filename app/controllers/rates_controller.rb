@@ -1,5 +1,6 @@
 class RatesController < ApplicationController
   include SortHelper
+  include RatesHelper
 
   SORT_OPTIONS = {
     'date_in_effect' => "#{Rate.table_name}.date_in_effect",
@@ -9,8 +10,9 @@ class RatesController < ApplicationController
   helper :users
   helper :sort
 
-  before_filter :permit_params
   before_filter :require_admin, only: [:edit, :update, :destroy]
+  before_filter :check_permissions
+  before_filter :permit_params
   before_filter :find_user, only: [:index, :new]
 
 
@@ -41,6 +43,14 @@ class RatesController < ApplicationController
   end
 
   def create
+    project = project_with_editable_rates
+                .where(id: rate_params[:project_id]).first
+
+    # only admins can assign global rates
+    if project.nil? and not User.current.admin?
+      return render_403
+    end
+
     @rate = Rate.new(rate_params)
 
     @rate.save
@@ -95,6 +105,10 @@ class RatesController < ApplicationController
   end
 
   private
+
+  def check_permissions
+    render_403 unless User.current.allowed_to_globally?(:view_rates)
+  end
 
   def permit_params
     params.permit! if defined?(ActionController::Parameters)

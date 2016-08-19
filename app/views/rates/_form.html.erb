@@ -1,8 +1,7 @@
 <fieldset class="box tabular">
   <p>
     <%= f.label :project_id %>
-    <%= f.select :project_id,
-        project_options_for_select_with_selected(Project.active, @rate.project) %>
+    <%= project_select_tag(@rate.project) %>
   </p>
   <p>
     <%= f.label :amount, value: l(:label_rate) %>
