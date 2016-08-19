@@ -47,6 +47,10 @@ module RedmineRate
         end
       end
     end
+
+    def self.supervisor_group
+      Group.find(supervisor_group_id) if supervisor_group_id?
+    end
   end
 
   def self.patch(patches = PATCHES)
@@ -89,5 +93,10 @@ module RedmineRate
     ActionDispatch::Reloader.to_prepare do
       plugin.patch
     end
+  end
+
+  def self.supervisor?(user = User.current)
+    User.current.admin? \
+    or User.current.is_or_belongs_to?(RedmineRate::Settings.supervisor_group)
   end
 end

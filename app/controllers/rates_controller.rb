@@ -46,7 +46,7 @@ class RatesController < ApplicationController
                 .where(id: rate_params[:project_id]).first
 
     # only admins can assign global rates
-    if project.nil? and not User.current.admin?
+    if project.nil? and not RedmineRate.supervisor?
       return render_403
     end
 
@@ -100,11 +100,17 @@ class RatesController < ApplicationController
   private
 
   def require_view_permission
-    render_403 unless User.current.allowed_to_globally?(:view_rates)
+    unless RedmineRate.supervisor? \
+      or User.current.allowed_to_globally?(:view_rates)
+      render_403
+    end
   end
 
   def require_edit_permission
-    render_403 unless User.current.allowed_to_globally?(:edit_rates)
+    unless RedmineRate.supervisor? \
+          or User.current.allowed_to_globally?(:edit_rates)
+      render_403
+    end
   end
 
   def permit_params

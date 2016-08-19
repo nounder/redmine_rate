@@ -3,7 +3,7 @@
     <%= sort_header_tag('date_in_effect', caption: l(:label_date)) %>
     <%= sort_header_tag('project_id', caption: l(:label_project)) %>
     <th><%= l(:label_rate) %></th>
-    <th></th>
+    <% if editable? %><th></th><% end %>
   </thead>
   <tbody>
     <% @rates.each do |rate| %>
@@ -17,6 +17,7 @@
         <% end %>
       </td>
       <td align="right"><%= h rate.amount %></td>
+      <% if editable? %>
       <td align="center">
         <% if rate.unlocked? %>
         <%= link_to image_tag('edit.png'), edit_rate_path(rate, :back_url => @back_url) %>
@@ -25,6 +26,7 @@
         <%= image_tag('locked.png') %>
         <% end %>
       </td>
+      <% end %>
     </tr>
   </tbody>
   <% end; reset_cycle %>

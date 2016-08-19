@@ -9,3 +9,5 @@ en:
   rate_label_currency: $
   label_user_rates: "%{value}'s rates"
   notice_rate_locked: Rate is locked and cannot be deleted
+  label_rate_supervisor_group: Supervisor group
+  text_rate_supervisor_group_info: Users of this group will have administrator privileges in Rate.
