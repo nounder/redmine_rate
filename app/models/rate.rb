@@ -14,6 +14,26 @@ class Rate < ActiveRecord::Base
   after_destroy :update_time_entry_cost_cache
   before_validation :fill_date
 
+  scope :recently, proc { order(date_in_effect: :desc) }
+
+  def self.visible(user = User.current)
+    project_ids = []
+
+    user.memberships.each do |m|
+      if m.roles.any? { |r| r.allowed_to?(:view_rate) }
+        project_ids << m.project_id
+      end
+    end
+
+    if user.admin?
+      all
+    elsif project_ids.any?
+      where(project_id: project_ids)
+    else
+      where('0=1')
+    end
+  end
+
   def self.history_for_user(user, order)
     includes(:project).where(user_id: user).order(order)
   end
