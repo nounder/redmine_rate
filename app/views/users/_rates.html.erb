@@ -1,0 +1,11 @@
+<div id="rates">
+  <h1><%= l(:label_rates) %></h1>
+  <%# TODO: Refactor out of the view once there is a hook in the controller (Post 0.8.0). %>
+  <%# Can't expect everyone to upgrade at the moment %>
+  <% sort_init "#{Rate.table_name}.date_in_effect", "desc" %>
+  <% sort_update RatesController::ValidSortOptions %>
+
+  <% @rates = Rate.history_for_user(@user, "#{Rate.table_name}.date_in_effect desc") %>
+
+  <%= render :partial => 'rates/list' %>
+</div>

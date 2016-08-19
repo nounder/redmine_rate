@@ -1,0 +1,124 @@
+class Rate < ActiveRecord::Base
+  class InvalidParameterException < Exception; end
+  belongs_to :project
+  belongs_to :user
+  has_many :time_entries
+
+  validates_presence_of :user_id
+  validates_presence_of :date_in_effect
+  validates_numericality_of :amount
+
+  before_save :unlocked?
+  after_save :update_time_entry_cost_cache
+  before_destroy :unlocked?
+  after_destroy :update_time_entry_cost_cache
+
+  def self.history_for_user(user, order)
+    includes(:project).where(user_id: user).order(order)
+  end
+
+  def locked?
+    return self.time_entries.length > 0
+  end
+
+  def unlocked?
+    return !self.locked?
+  end
+
+  def default?
+    return self.project.nil?
+  end
+
+  def specific?
+    return !self.default?
+  end
+
+  def update_time_entry_cost_cache
+    TimeEntry.update_cost_cache(user, project)
+  end
+
+  # API to find the Rate for a +user+ on a +project+ at a +date+
+  def self.for(user, project = nil, date = Date.today.to_s)
+    # Check input since it's a "public" API
+    if Object.const_defined? 'Group' # 0.8.x compatibility
+      raise Rate::InvalidParameterException.new("user must be a Principal instance") unless user.is_a?(Principal)
+    else
+      raise Rate::InvalidParameterException.new("user must be a User instance") unless user.is_a?(User)
+    end
+    raise Rate::InvalidParameterException.new("project must be a Project instance") unless project.nil? || project.is_a?(Project)
+    Rate.check_date_string(date)
+
+    rate = self.for_user_project_and_date(user, project, date)
+    # Check for a default (non-project) rate
+    rate = self.default_for_user_and_date(user, date) if rate.nil? && project
+    rate
+  end
+
+  # API to find the amount for a +user+ on a +project+ at a +date+
+  def self.amount_for(user, project = nil, date = Date.today.to_s)
+    rate = self.for(user, project, date)
+
+    return nil if rate.nil?
+    return rate.amount
+  end
+
+  def self.update_all_time_entries_with_missing_cost(options={})
+    ActiveRecord::Base.transaction do
+      TimeEntry.all(:conditions => {:cost => nil}).each do |time_entry|
+        begin
+          time_entry.save_cached_cost
+        rescue Rate::InvalidParameterException => ex
+          puts "Error saving #{time_entry.id}: #{ex.message}"
+        end
+      end
+    end
+    store_cache_timestamp('last_caching_run', Time.now.utc.to_s)
+  end
+
+  def self.update_all_time_entries_to_refresh_cache(options={})
+    ActiveRecord::Base.transaction do
+      TimeEntry.find_each do |time_entry| # batch find
+        begin
+          time_entry.save_cached_cost
+        rescue Rate::InvalidParameterException => ex
+          puts "Error saving #{time_entry.id}: #{ex.message}"
+        end
+      end
+    end
+    store_cache_timestamp('last_cache_clearing_run', Time.now.utc.to_s)
+  end
+
+  private
+
+  def self.for_user_project_and_date(user, project, date)
+    rates = self.order('date_in_effect DESC').where(user_id: user)
+
+    if project.nil?
+      rates = rates.where('project_id IS NULL')
+    else
+      rates = rates.where(project_id: project)
+    end
+
+    rates.where(arel_table[:date_in_effect].lteq(date)).first
+  end
+
+  def self.default_for_user_and_date(user, date)
+    self.for_user_project_and_date(user, nil, date)
+  end
+
+  # Checks a date string to make sure it is in format of +YYYY-MM-DD+, throwing
+  # a Rate::InvalidParameterException otherwise
+  def self.check_date_string(date)
+    raise Rate::InvalidParameterException.new("date must be a valid Date string (e.g. YYYY-MM-DD)") unless date.is_a?(String)
+
+    begin
+      Date.parse(date)
+    rescue ArgumentError
+      raise Rate::InvalidParameterException.new("date must be a valid Date string (e.g. YYYY-MM-DD)")
+    end
+  end
+
+  def self.store_cache_timestamp(cache_name, timestamp)
+    Setting.plugin_redmine_rate = Setting.plugin_redmine_rate.merge({cache_name => timestamp})
+  end
+end
