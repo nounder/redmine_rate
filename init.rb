@@ -10,11 +10,10 @@ Redmine::Plugin.register :redmine_rate do
 
   requires_redmine version_or_higher: '2.3.0'
 
-  settings default: {
-             last_caching_run: nil
-           }
-
-  permission :view_rate, {}
+  project_module :rate do
+    permission :view_rates, {}, require: :member
+    permission :edit_rates, {}, require: :member
+  end
 end
 
 RedmineRate.install

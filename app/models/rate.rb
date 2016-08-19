@@ -20,7 +20,7 @@ class Rate < ActiveRecord::Base
     project_ids = []
 
     user.memberships.each do |m|
-      if m.roles.any? { |r| r.allowed_to?(:view_rate) }
+      if m.roles.any? { |r| r.allowed_to?(:view_rates) }
         project_ids << m.project_id
       end
     end

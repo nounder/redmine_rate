@@ -23,7 +23,7 @@ module RedmineRate
 
     # Renders an additional table header to the membership setting
     def view_projects_settings_members_table_header(context ={ })
-      return '' unless (User.current.allowed_to?(:view_rate, context[:project]) || User.current.admin?)
+      return '' unless (User.current.allowed_to?(:view_rates, context[:project]) || User.current.admin?)
       return "<th>#{l(:label_rate)} #{l(:rate_label_currency)}</td>"
     end
 
@@ -32,7 +32,7 @@ module RedmineRate
       member = context[:member]
       project = context[:project]
 
-      return '' unless (User.current.allowed_to?(:view_rate, project) || User.current.admin?)
+      return '' unless (User.current.allowed_to?(:view_rates, project) || User.current.admin?)
 
       if Object.const_defined? 'Group' # 0.8.x compatibility
         # Groups cannot have a rate
