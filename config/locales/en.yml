@@ -8,3 +8,4 @@ en:
   label_rate_cost: Cost
   rate_label_currency: $
   label_user_rates: "%{value}'s rates"
+  notice_rate_locked: Rate is locked and cannot be deleted

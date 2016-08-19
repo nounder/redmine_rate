@@ -24,7 +24,6 @@ class RatesController < ApplicationController
 
     respond_to do |format|
       format.html { render :action => 'index', :layout => !request.xhr?}
-      format.xml  { render :xml => @rates }
     end
   end
 
@@ -34,7 +33,6 @@ class RatesController < ApplicationController
     respond_to do |format|
       format.html
       format.js
-      format.xml  { render :xml => @rate }
     end
   end
 
@@ -74,33 +72,31 @@ class RatesController < ApplicationController
   def update
     @rate = Rate.find(params[:id])
 
-    respond_to do |format|
-      # Locked rates will fail saving here.
-      if @rate.update_attributes(rate_params)
-        flash[:notice] = 'Rate was successfully updated.'
-        format.html { redirect_back_or_default(rates_url(:user_id => @rate.user_id)) }
-        format.xml  { head :ok }
-      else
-        if @rate.locked?
-          flash[:error] = "Rate is locked and cannot be edited"
-          @rate.reload # Removes attribute changes
-        end
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @rate.errors, :status => :unprocessable_entity }
+    if @rate.update_attributes(rate_params)
+      flash[:notice] = l(:notice_successful_update)
+      redirect_back_or_default(rates_url(user_id: @rate.user_id))
+    else
+      if @rate.locked?
+        flash[:error] = l(:notice_rate_locked)
+        @rate.reload # Removes attribute changes
       end
+      render :edit
     end
   end
 
   def destroy
     @rate = Rate.find(params[:id])
-    @rate.destroy
 
-    respond_to do |format|
-      format.html {
-        flash[:error] = "Rate is locked and cannot be deleted" if @rate.locked?
-        redirect_back_or_default(rates_url(:user_id => @rate.user_id))
-      }
-      format.xml  { head :ok }
+    if @rate.locked?
+      flash[:error] = l(:notice_rate_locked)
+
+      redirect_to user_rates_path(@rate.user_id)
+    else
+      @rate.destroy
+
+      flash[:notice] = l(:notice_successful_delete)
+
+      redirect_to user_rates_path(@rate.user_id)
     end
   end
 
@@ -120,10 +116,5 @@ class RatesController < ApplicationController
 
   def find_user
     @user = User.find(params[:user_id])
-  end
-
-  def set_back_url
-    @back_url = params[:back_url]
-    @back_url
   end
 end
