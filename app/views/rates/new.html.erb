@@ -1,7 +1,7 @@
 <h1><%= l(:label_set_rate) %></h1>
 
 <%= form_for(@rate) do |f| %>
-<%= render :partial => 'rates/form', locals: { f: f } %>
+<%= render partial: 'rates/form', locals: { f: f } %>
 
 <%= submit_tag((@rate.new_record? ? l(:button_add) : l(:button_update)),
     class: 'button-small')-%>

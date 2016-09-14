@@ -18,7 +18,7 @@ class Rate < ActiveRecord::Base
 
   def self.visible(user = User.current)
     if RedmineRate.supervisor?(user)
-      all
+      self
     else
       project_ids = []
 

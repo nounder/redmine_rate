@@ -1,2 +1,6 @@
 <h1>Editing rate</h1>
-<%= render :partial => 'form' %>
+<%= form_for(@rate) do |f| %>
+<%= render partial: 'rates/form', locals: { f: f } %>
+
+<%= submit_tag(l(:button_update), class: 'button-small') %>
+<% end %>

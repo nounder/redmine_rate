@@ -71,7 +71,7 @@ class RatesController < ApplicationController
 
     if @rate.update_attributes(rate_params)
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default(rates_url(user_id: @rate.user_id))
+      redirect_to user_rates_path(@rate.user_id)
     else
       if @rate.locked?
         flash[:error] = l(:notice_rate_locked)
