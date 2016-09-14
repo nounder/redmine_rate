@@ -1,4 +1,4 @@
-<% if User.current.allowed_to_globally?(:view_rates) \
+<% if User.current.allowed_to_globally?(:view_rates, {}) \
    or RedmineRate.supervisor? %>
 <h3><%= link_to l(:label_rates), user_rates_path(@user) %></h3>
 <% end %>
