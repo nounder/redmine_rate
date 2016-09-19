@@ -2,6 +2,8 @@ module RedmineRate
   module Patches
     module UsersHelperPatch
       def self.included(base)
+        base.send(:include, RatesHelper)
+
         base.class_eval do
           alias_method_chain :user_settings_tabs, :rate_tab
         end
