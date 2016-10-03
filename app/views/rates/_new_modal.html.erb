@@ -12,7 +12,7 @@
   </p>
 <% end %>
 
-<% if @rates %>
+<% if @rates.try(:any?) %>
 <table class="list" style="margin-top: 40px">
   <thead>
     <th><%= l(:label_date) %></th>
@@ -26,7 +26,7 @@
       <td><%= h format_date(rate.date_in_effect) %></td>
       <td>
         <% if rate.project %>
-        <%= link_to(h(rate.project), :controller => 'projects', :action => 'show', :id => rate.project) %>
+        <%= link_to(h(rate.project), project_path(rate.project)) %>
         <% else %>
         <em><%= l(:label_default_rate) %></em>
         <% end %>

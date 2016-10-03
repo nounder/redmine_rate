@@ -29,7 +29,9 @@ class RatesController < ApplicationController
   end
 
   def new
+    @project = Project.find(params[:project_id]) if params[:project_id]
     @rate = Rate.new(user_id: @user.id)
+    @rates = Rate.visible.where(user_id: @user.id)
 
     respond_to do |format|
       format.html
@@ -101,14 +103,14 @@ class RatesController < ApplicationController
 
   def require_view_permission
     unless RedmineRate.supervisor? \
-      or User.current.allowed_to_globally?(:view_rates)
+      or User.current.allowed_to_globally?(:view_rates, {})
       render_403
     end
   end
 
   def require_edit_permission
     unless RedmineRate.supervisor? \
-          or User.current.allowed_to_globally?(:edit_rates)
+          or User.current.allowed_to_globally?(:edit_rates, {})
       render_403
     end
   end
