@@ -1,4 +1,6 @@
-<h3 class="title"><%= l(:label_new_rate) %></h3>
+<h3 class="title">
+  <%= l(:label_user_rates, value: link_to_user(@user)).html_safe %></h2>
+</h3>
 
 <%= form_for(@rate, remote: true) do |f| %>
   <%= render partial: 'form', locals: { f: f } %>
@@ -8,4 +10,40 @@
     <%= submit_tag l(:button_cancel), name: nil, type: 'button',
         onclick: "hideModal(this);" %>
   </p>
+<% end %>
+
+<% if @rates %>
+<table class="list" style="margin-top: 40px">
+  <thead>
+    <th><%= l(:label_date) %></th>
+    <th><%= l(:label_project) %></th>
+    <th><%= l(:label_rate) %></th>
+    <% if editable? %><th></th><% end %>
+  </thead>
+  <tbody>
+    <% @rates.each do |rate| %>
+    <tr class="<%= cycle 'odd', 'even' %>">
+      <td><%= h format_date(rate.date_in_effect) %></td>
+      <td>
+        <% if rate.project %>
+        <%= link_to(h(rate.project), :controller => 'projects', :action => 'show', :id => rate.project) %>
+        <% else %>
+        <em><%= l(:label_default_rate) %></em>
+        <% end %>
+      </td>
+      <td align="right"><%= h rate.amount %></td>
+      <% if editable? %>
+      <td align="center">
+        <% if rate.unlocked? %>
+        <%= link_to image_tag('edit.png'), edit_rate_path(rate, :back_url => @back_url) %>
+        <%= link_to image_tag('delete.png'), rate_path(rate, :back_url => @back_url), :method => :delete, :confirm => l(:text_are_you_sure) %>
+        <% else %>
+        <%= image_tag('locked.png') %>
+        <% end %>
+      </td>
+      <% end %>
+    </tr>
+  </tbody>
+  <% end; reset_cycle %>
+</table>
 <% end %>
