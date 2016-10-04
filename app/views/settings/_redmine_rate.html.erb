@@ -3,7 +3,7 @@
 <fieldset>
   <p id="supervisor_group">
     <label><%= l(:label_rate_supervisor_group) %></label>
-    <%= select_tag('settings[supervisor_group_id]', options_from_collection_for_select(Group.givable, 'id', 'name',
+    <%= select_tag('settings[supervisor_group_id]', options_from_collection_for_select(Group.where(type: 'Group'), 'id', 'name',
         settings.supervisor_group_id), include_blank: true) %>
     <em class="info"><%= l(:text_rate_supervisor_group_info) %></em>
   </p>
