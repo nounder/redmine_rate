@@ -1,0 +1,9 @@
+de:
+  label_rate: Betrag
+  label_rates: Betraege
+  label_default_rate: Standard Betrag
+  label_rate_new: Betrag setzen
+  label_rate_cost: Kosten
+  field_amount: Betrag
+  rate_label_currency: EUR
+

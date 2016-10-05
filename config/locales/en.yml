@@ -2,12 +2,11 @@ en:
   label_rate: Rate
   label_rates: Rates
   label_default_rate: Default rate
-  label_rate_history: Rate History
-  label_new_rate: New rate
-  label_set_rate: Set rate
+  label_rate_new: New rate
   label_rate_cost: Cost
+  field_amount: Amount
   rate_label_currency: $
   label_user_rates: "%{value}'s rates"
-  notice_rate_locked: Rate is locked and cannot be deleted
+  notice_rate_locked: Rate is locked and cannot be deleted.
   label_rate_supervisor_group: Supervisor group
   text_rate_supervisor_group_info: Users of this group will have administrator privileges in Rate.

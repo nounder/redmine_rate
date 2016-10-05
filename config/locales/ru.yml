@@ -1,0 +1,8 @@
+ru:
+  label_rate: Платеж
+  label_rates: Платежи
+  label_default_rate: Платеж по умолчанию
+  label_rate_new: Установить платеж
+  label_rate_cost: расходы
+  field_amount: количество
+  rate_label_currency: $

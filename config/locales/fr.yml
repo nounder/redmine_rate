@@ -1,0 +1,8 @@
+fr:
+  label_rate: Tarif
+  label_rates: Tarifs
+  label_default_rate: Tarif par défaut
+  label_rate_new: Parametrage du tarif
+  label_rate_cost: Coût
+  field_amount: Montant
+  rate_label_currency: €

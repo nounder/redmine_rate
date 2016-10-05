@@ -1,5 +1,5 @@
 <fieldset class="box tabular">
-  <legend><%= l(:label_new_rate) %></legend>
+  <legend><%= l(:label_rate_new) %></legend>
   <p>
     <%= f.label :project_id %>
     <%= project_select_tag(Rate.for(@user) ? (@rate.project || @project) : nil) %>
