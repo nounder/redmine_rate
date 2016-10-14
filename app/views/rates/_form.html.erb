@@ -2,7 +2,7 @@
   <legend><%= l(:label_rate_new) %></legend>
   <p>
     <%= f.label :project_id %>
-    <%= project_select_tag(Rate.for(@user) ? (@rate.project || @project) : nil) %>
+    <%= project_select_tag(@project) %>
   </p>
   <p>
     <%= f.label :amount, value: l(:label_rate) %>
