@@ -1,9 +1,19 @@
 <fieldset class="box tabular">
-  <legend><%= l(:label_rate_new) %></legend>
+  <% if @rate.new_record? %>
+    <legend><%= l(:label_rate_new) %></legend>
+  <% end %>
   <p>
     <%= f.label :project_id %>
     <%= project_select_tag(@project) %>
   </p>
+
+  <% unless @rate.new_record? %>
+  <p>
+    <%= f.label :date_in_effect, l(:label_date) %>
+    <%= f.text_field :date_in_effect, size: 10 %>
+    <%= calendar_for('rate_date_in_effect') %>
+  </p>
+  <% end %>
   <p>
     <%= f.label :amount, value: l(:label_rate) %>
     <%= f.text_field :amount, size: 10 %>

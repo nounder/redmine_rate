@@ -61,7 +61,7 @@ class Rate < ActiveRecord::Base
   end
 
   def fill_date
-    self.date_in_effect = Date.today if new_record?
+    self.date_in_effect ||= Date.today if new_record?
   end
 
   # API to find the Rate for a +user+ on a +project+ at a +date+
