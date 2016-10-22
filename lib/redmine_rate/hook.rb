@@ -3,38 +3,26 @@ module RedmineRate
     render_on :view_account_left_bottom,
               partial: 'hooks/redmine_rate/view_account_left_bottom'
     render_on :view_users_memberships_table_row,
-              partial: 'users/membership_rate'
+              partial: 'hooks/redmine_rate/view_users_memberships_table_row'
+    render_on :view_projects_settings_members_table_row,
+              partial: 'hooks/redmine_rate/view_projects_settings_members_table_row'
 
     def view_layouts_base_html_head(context={})
-      return content_tag(:style, "#admin-menu a.rate-caches { background-image: url('.'); }", :type => 'text/css')
+      content_tag(:style, "#admin-menu a.rate-caches { background-image: url('.'); }", :type => 'text/css')
     end
 
-    def view_users_memberships_table_header(context={})
-      return content_tag(:th, l(:label_rate) + ' ' + l(:rate_label_currency))
+    def view_users_memberships_table_header(context= {})
+      content_tag(:th, l(:label_rate) + ' ' + l(:rate_label_currency))
+    end
+
+    def view_projects_settings_members_table_header(context= {})
+      content_tag(:th, l(:label_rate) + ' ' + l(:rate_label_currency))
     end
 
     # Renders an additional table header to the membership setting
     def view_projects_settings_members_table_header(context ={ })
       return '' unless (User.current.allowed_to?(:view_rates, context[:project]) || User.current.admin?)
       return "<th>#{l(:label_rate)}</td>"
-    end
-
-    # Renders an AJAX from to update the member's billing rate
-    def view_projects_settings_members_table_row(context = { })
-      member = context[:member]
-      project = context[:project]
-
-      if (User.current.allowed_to?(:view_rates, project) \
-          or User.current.admin?) and not member.principal.is_a?(Group)
-        rate = Rate.for(member.principal, project)
-        content = link_to(rate ? number_to_currency(rate.amount) : l(:label_new),
-                          new_user_rate_path(member.user, project_id: project.id), remote: true)
-
-        content_tag(:td, content.html_safe,
-                    id: "rate_#{project.id}_#{member.user.id}" )
-      else
-        content_tag(:td, '')
-      end
     end
 
     def model_project_copy_before_save(context = {})

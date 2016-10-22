@@ -1,0 +1,5 @@
+<td id="rate_<%= membership.project.id %>_<%= membership.user.id %>">
+  <% rate = Rate.for(user, membership.project) %>
+  <%= link_to(rate ? number_to_currency(rate.amount) : l(:label_new),
+      new_user_rate_path(user, project_id: membership.project.id), remote: true) %>
+</td>
