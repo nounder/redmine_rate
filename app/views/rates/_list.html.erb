@@ -1,22 +1,31 @@
-<table class="list">
+<table id="rate-list" class="list rates">
   <thead>
-    <%= sort_header_tag('date_in_effect', caption: l(:label_date)) %>
-    <%= sort_header_tag('project_id', caption: l(:label_project)) %>
-    <th><%= l(:label_rate) %></th>
-    <% if editable? %><th></th><% end %>
+    <tr>
+      <% @query.inline_columns.each do |column| %>
+      <%= column_header(column) %>
+      <% end %>
+      <%= content_tag(:th) if editable? %>
+    </tr>
   </thead>
+  <% previous_group = false %>
   <tbody>
-    <% @rates.each do |rate| %>
-    <tr class="<%= cycle 'odd', 'even' %>">
-      <td><%= h format_date(rate.date_in_effect) %></td>
-      <td>
-        <% if rate.project %>
-        <%= link_to(h(rate.project), :controller => 'projects', :action => 'show', :id => rate.project) %>
-        <% else %>
-        <em><%= l(:label_default_rate) %></em>
-        <% end %>
+    <% @rates.each do |rate| -%>
+    <% if @query.grouped? && (group = @query.group_by_column.value(rate)) != previous_group %>
+    <% reset_cycle %>
+    <tr class="group open">
+      <td colspan="<%= @query.inline_columns.length %>">
+        <span class="expander" onclick="toggleRowGroup(this);">&nbsp;</span>
+        <%= group.blank? ? l(:label_none) : column_content(@query.group_by_column, rate) %>
       </td>
-      <td align="right"><%= h rate.amount %></td>
+      <td align="center">
+        <%= link_to '', new_user_rate_path(rate.user),
+            remote: true, class: 'icon icon-add' if @user.nil? %>
+      </td>
+    </tr>
+    <% previous_group = group %>
+    <% end %>
+    <tr id="rate-<%= rate.id %>" class="<%= cycle('odd', 'even') %> rate">
+      <%= raw @query.inline_columns.map {|column| "<td class=\"#{column.css_classes}\">#{column_content(column, rate)}</td>"}.join %>
       <% if editable? %>
       <td align="center">
         <% if rate.unlocked? %>
@@ -28,6 +37,6 @@
       </td>
       <% end %>
     </tr>
+    <% end %>
   </tbody>
-  <% end; reset_cycle %>
 </table>

@@ -9,5 +9,37 @@
 
   <% @rates = Rate.visible.recently.includes(:project).where(user_id: @user.id) %>
 
-  <%= render partial: 'rates/list' %>
+  <table class="list">
+    <thead>
+      <%= sort_header_tag('date_in_effect', caption: l(:label_date)) %>
+      <%= sort_header_tag('project_id', caption: l(:label_project)) %>
+      <th><%= l(:label_rate) %></th>
+      <% if editable? %><th></th><% end %>
+    </thead>
+    <tbody>
+      <% @rates.each do |rate| %>
+      <tr class="<%= cycle 'odd', 'even' %>">
+        <td><%= h format_date(rate.date_in_effect) %></td>
+        <td>
+          <% if rate.project %>
+          <%= link_to(h(rate.project), :controller => 'projects', :action => 'show', :id => rate.project) %>
+          <% else %>
+          <em><%= l(:label_default_rate) %></em>
+          <% end %>
+        </td>
+        <td align="right"><%= h rate.amount %></td>
+        <% if editable? %>
+        <td align="center">
+          <% if rate.unlocked? %>
+          <%= link_to image_tag('edit.png'), edit_rate_path(rate, :back_url => @back_url) %>
+          <%= link_to image_tag('delete.png'), rate_path(rate, :back_url => @back_url), :method => :delete, :confirm => l(:text_are_you_sure) %>
+          <% else %>
+          <%= image_tag('locked.png') %>
+          <% end %>
+        </td>
+        <% end %>
+      </tr>
+    </tbody>
+    <% end; reset_cycle %>
+  </table>
 </div>

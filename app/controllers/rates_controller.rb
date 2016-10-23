@@ -8,20 +8,29 @@ class RatesController < ApplicationController
   }
 
   helper :users
+  helper :queries
   helper :sort
 
-  before_filter :require_admin, only: [:edit, :update, :destroy]
   before_filter :require_view_permission
   before_filter :require_edit_permission, only: [:new, :create]
   before_filter :permit_params
-  before_filter :find_user, only: [:index, :new]
-
+  before_filter :setup_query, only: [:index]
 
   def index
-    sort_init '#{Rate.table_name}.date_in_effect', 'desc'
-    sort_update SORT_OPTIONS
+    if params[:user_id]
+      @query.add_filter('user_id', '=', [ params[:user_id] ])
+      session[:query] = { filters: @query.filters }
 
-    @rates = Rate.visible.where(user_id: @user.id).order(sort_clause)
+      return redirect_to(rates_path)
+    end
+
+    @limit = per_page_option
+    @rate_count = @query.rate_count
+    @rate_pages = Paginator.new(@rate_count, @limit, params['page'])
+
+    @rates = @query.rates(order: sort_clause,
+                          offset: @rate_pages.offset,
+                          limit: @limit)
 
     respond_to do |format|
       format.html { render :action => 'index', :layout => !request.xhr?}
@@ -30,8 +39,9 @@ class RatesController < ApplicationController
 
   def new
     @project = Project.find(params[:project_id]) if params[:project_id]
+    @user = User.find(params[:user_id]) if params[:user_id]
     @rate = Rate.new(user_id: @user.id)
-    @rates = Rate.visible.where(user_id: @user.id)
+    @rates = Rate.visible.recently.where(user_id: @user.id)
 
     respond_to do |format|
       format.html
@@ -101,6 +111,21 @@ class RatesController < ApplicationController
 
   private
 
+  def setup_query
+    if session[:query]
+      @query = RateQuery.new(name: '_', filters: session[:query][:filters])
+      session.delete(:query)
+    else
+      @query = RateQuery.new(name: '_')
+      @query.build_from_params(params)
+    end
+
+    sort_update(SORT_OPTIONS)
+    @query.sort_criteria = sort_criteria.to_a
+
+    @query.group_by = 'user'
+  end
+
   def require_view_permission
     unless RedmineRate.supervisor? \
       or User.current.allowed_to_globally?(:view_rates, {})
@@ -121,9 +146,5 @@ class RatesController < ApplicationController
 
   def rate_params
     params[:rate]
-  end
-
-  def find_user
-    @user = User.find(params[:user_id])
   end
 end

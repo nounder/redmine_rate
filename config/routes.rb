@@ -1,5 +1,5 @@
 RedmineApp::Application.routes.draw do
-  resources :rates, except: [:index]
+  resources :rates
 
   resources :users do
     resources :rates, only: [:index, :new]
