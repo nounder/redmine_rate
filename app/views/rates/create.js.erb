@@ -1,5 +1,9 @@
 <% if @rate.valid? %>
+if (document.getElementById("query_form")) {
+  document.getElementById("query_form").submit();
+} else {
   location.reload();
+}
 <% else %>
  alert('<%= @rate.errors.full_messages.first %>');
 <% end %>
