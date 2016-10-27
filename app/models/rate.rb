@@ -14,7 +14,7 @@ class Rate < ActiveRecord::Base
   after_destroy :update_time_entry_cost_cache
   before_validation :fill_date
 
-  scope :recently, proc { order(date_in_effect: :desc) }
+  scope :recently, proc { order('date_in_effect DESC') }
 
   def self.visible(user = User.current)
     if RedmineRate.supervisor?(user)
