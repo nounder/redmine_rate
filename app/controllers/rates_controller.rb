@@ -19,7 +19,7 @@ class RatesController < ApplicationController
   def index
     if params[:user_id]
       @query.add_filter('user_id', '=', [ params[:user_id] ])
-      session[:query] = { filters: @query.filters }
+      session[:query] = { type: 'RateQuery', filters: @query.filters }
 
       return redirect_to(rates_path)
     end
@@ -112,7 +112,7 @@ class RatesController < ApplicationController
   private
 
   def setup_query
-    if session[:query]
+    if session[:query] and session[:query][:type] == 'RateQuery'
       @query = RateQuery.new(name: '_', filters: session[:query][:filters])
       session.delete(:query)
     else
