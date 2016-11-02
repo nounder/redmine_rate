@@ -1,8 +1,16 @@
-<div class="contextual">
-  <%= link_to l(:label_rate_new), new_user_rate_path(@user),
-      remote: true, class: 'icon icon-add' %>
-</div>
+<h2><%= l(:label_rates) %></h2>
 
-<h2><%= l(:label_user_rates, value: link_to_user(@user)).html_safe %></h2>
+<%= render partial: 'query_form' %>
 
-<%= render :partial => 'list' %>
+<% if @query.valid? %>
+<% if @rates.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<%= render partial: 'list' %>
+<p class="pagination"><%= pagination_links_full @rate_pages, @rate_count %></p>
+<% end %>
+<% end %>
+
+<% content_for :header_tags do %>
+<%= stylesheet_link_tag 'rate.css', plugin: 'redmine_rate', media: 'screen' %>
+<% end %>
