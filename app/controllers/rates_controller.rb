@@ -123,7 +123,7 @@ class RatesController < ApplicationController
     sort_update(SORT_OPTIONS)
     @query.sort_criteria = sort_criteria.to_a
 
-    @query.group_by = 'user'
+    @query.group_by = 'user' unless params[:f]
   end
 
   def require_view_permission

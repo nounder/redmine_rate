@@ -19,7 +19,7 @@
       </td>
       <td align="center">
         <%= link_to '', new_user_rate_path(rate.user),
-            remote: true, class: 'icon icon-add' if @user.nil? %>
+            remote: true, class: 'icon icon-add' if @user.nil? and @query.group_by == 'user' %>
       </td>
     </tr>
     <% previous_group = group %>

@@ -7,6 +7,21 @@
       <%= render partial: 'queries/filters', locals: { query: @query} %>
     </div>
   </fieldset>
+  <fieldset class="collapsible collapsed">
+    <legend onclick="toggleFieldset(this);"><%= l(:label_options) %></legend>
+    <div style="display: none;">
+      <table>
+        <tr>
+          <td><label for='group_by'><%= l(:field_group_by) %></label></td>
+          <td><%= select_tag('group_by',
+                  options_for_select(
+                  [[]] + @query.groupable_columns.collect {|c| [c.caption, c.name.to_s]},
+                  @query.group_by)
+                  ) %></td>
+        </tr>
+      </table>
+    </div>
+  </fieldset>
 </div>
 <p class="buttons hide-when-print">
   <%= link_to_function l(:button_apply), '$("#query_form").submit();', class: 'icon icon-checked' %>

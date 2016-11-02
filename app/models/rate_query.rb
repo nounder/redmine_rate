@@ -3,7 +3,7 @@ class RateQuery < Query
 
   self.available_columns = [
     QueryColumn.new(:user, sortable: lambda { User.fields_for_order_statement }, groupable: true),
-    QueryColumn.new(:project),
+    QueryColumn.new(:project, groupable: true),
     QueryColumn.new(:date_in_effect, sortable: "#{Rate.table_name}.date_in_effect",
                     caption: :label_date),
     QueryColumn.new(:amount, caption: :field_amount)
@@ -15,7 +15,11 @@ class RateQuery < Query
   end
 
   def default_columns_names
-    [:project, :date_in_effect, :amount]
+    case group_by
+    when 'user' then [:project, :date_in_effect, :amount]
+    when 'project' then [:user, :date_in_effect, :amount]
+    else [:user, :project, :date_in_effect, :amount]
+    end
   end
 
   def initialize_available_filters
@@ -59,7 +63,6 @@ class RateQuery < Query
       .where(statement)
       .includes(([:user, :project] + (options[:include] || [])).uniq)
       .order(order_option)
-      .joins(joins_for_order_statement(order_option.join(',')))
       .limit(options[:limit])
       .offset(options[:offset])
   end
