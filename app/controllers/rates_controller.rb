@@ -12,7 +12,7 @@ class RatesController < ApplicationController
   helper :sort
 
   before_filter :require_view_permission
-  before_filter :require_edit_permission, only: [:new, :create]
+  before_filter :require_edit_permission, only: [:new, :create, :update_form]
   before_filter :permit_params
   before_filter :setup_query, only: [:index]
 
@@ -40,8 +40,12 @@ class RatesController < ApplicationController
   def new
     @project = Project.find(params[:project_id]) if params[:project_id]
     @user = User.find(params[:user_id]) if params[:user_id]
-    @rate = Rate.new(user_id: @user.id)
-    @rates = Rate.visible.recently.where(user_id: @user.id)
+    @rate = Rate.new
+
+    if @user
+      @rate.user = @user
+      @rates = Rate.visible.recently.where(user_id: @user.id)
+    end
 
     respond_to do |format|
       format.html
@@ -107,6 +111,12 @@ class RatesController < ApplicationController
 
       redirect_to user_rates_path(@rate.user_id)
     end
+  end
+
+  def update_form
+    @rate = Rate.new(params[:rate])
+
+    @projects = @rate.user.projects if @rate.user
   end
 
   private

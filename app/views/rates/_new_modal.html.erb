@@ -1,5 +1,9 @@
 <h3 class="title">
-  <%= l(:label_user_rates, value: link_to_user(@user)).html_safe %>
+  <% if @user %>
+    <%= l(:label_user_rates, value: link_to_user(@user)).html_safe %>
+  <% else %>
+    <%= l(:label_rate_new) %>
+  <% end %>
 </h3>
 
 <%= form_for(@rate, remote: true) do |f| %>

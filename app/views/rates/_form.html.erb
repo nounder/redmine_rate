@@ -2,6 +2,16 @@
   <% if @rate.new_record? %>
     <legend><%= l(:label_rate_new) %></legend>
   <% end %>
+
+  <% if @rate.user.nil? %>
+  <p>
+    <%= f.label :user_id %>
+    <%= f.select :user_id, User.active.map { |u| [u.name, u.id.to_s] } %>
+  </p>
+  <% else %>
+  <%= f.hidden_field :user_id %>
+  <% end %>
+
   <p>
     <%= f.label :project_id %>
     <%= project_select_tag(@project) %>
@@ -20,4 +30,13 @@
   </p>
 </fieldset>
 
-<%= f.hidden_field :user_id %>
+<script>
+  $('#new_rate select').on('change', function() {
+    $.ajax({
+      type: 'POST',
+      dataType: 'script',
+      url: '<%= rate_update_form_path %>',
+      data: $('#new_rate').serialize()
+    });
+  });
+</script>
