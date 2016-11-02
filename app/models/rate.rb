@@ -7,8 +7,9 @@ class Rate < ActiveRecord::Base
   validates_presence_of :user_id
   validates_presence_of :date_in_effect
   validates_numericality_of :amount
+  validates :project_id, presence: true, unless: proc { RedmineRate.supervisor? }
 
-  before_save :unlocked?
+  before_save :unlocked?, :protect_project
   after_save :update_time_entry_cost_cache
   before_destroy :unlocked?
   after_destroy :update_time_entry_cost_cache
@@ -115,7 +116,27 @@ class Rate < ActiveRecord::Base
     store_cache_timestamp('last_cache_clearing_run', Time.now.utc.to_s)
   end
 
+  def selectable_projects(editor = User.current)
+    if RedmineRate.supervisor?(editor)
+      projects = Project.active.has_module(:rate)
+    else
+      projects = Project.where(Project.allowed_to_condition(editor, :edit_rates))
+    end
+
+    if user
+      projects = projects.where(Project.visible_condition(user))
+    end
+
+    projects
+  end
+
   private
+
+  def protect_project
+    if selectable_projects.where(id: project_id).blank?
+      self.project = nil
+    end
+  end
 
   def self.for_user_project_and_date(user, project, date)
     rates = self.order('date_in_effect DESC').where(user_id: user)

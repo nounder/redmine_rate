@@ -40,7 +40,9 @@ class RatesController < ApplicationController
   def new
     @project = Project.find(params[:project_id]) if params[:project_id]
     @user = User.find(params[:user_id]) if params[:user_id]
+
     @rate = Rate.new
+    @rate.project = @project if @project
 
     if @user
       @rate.user = @user
@@ -58,14 +60,6 @@ class RatesController < ApplicationController
   end
 
   def create
-    project = project_with_editable_rates
-                .where(id: rate_params[:project_id]).first
-
-    # only admins can assign global rates
-    if project.nil? and not RedmineRate.supervisor?
-      return render_403
-    end
-
     @rate = Rate.new(rate_params)
 
     @rate.save
@@ -115,8 +109,6 @@ class RatesController < ApplicationController
 
   def update_form
     @rate = Rate.new(params[:rate])
-
-    @projects = @rate.user.projects if @rate.user
   end
 
   private

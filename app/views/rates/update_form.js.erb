@@ -1,3 +1,3 @@
 <% if @rate.user %>
-$('#rate_project_id').replaceWith('<%= escape_javascript(project_select_tag(@rate.project, @rate.user)) %>');
+$('#rate_project_id').replaceWith('<%= escape_javascript(project_select_tag(@rate)) %>');
 <% end %>
