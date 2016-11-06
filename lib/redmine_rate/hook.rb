@@ -7,22 +7,26 @@ module RedmineRate
     render_on :view_projects_settings_members_table_row,
               partial: 'hooks/redmine_rate/view_projects_settings_members_table_row'
 
-    def view_layouts_base_html_head(context={})
+    def view_layouts_base_html_head(context = {})
       content_tag(:style, "#admin-menu a.rate-caches { background-image: url('.'); }", :type => 'text/css')
     end
 
-    def view_users_memberships_table_header(context= {})
+    def view_users_memberships_table_header(context = {})
       content_tag(:th, l(:label_rate) + ' ' + l(:rate_label_currency))
     end
 
-    def view_projects_settings_members_table_header(context= {})
+    def view_projects_settings_members_table_header(context = {})
       content_tag(:th, l(:label_rate) + ' ' + l(:rate_label_currency))
     end
 
     # Renders an additional table header to the membership setting
-    def view_projects_settings_members_table_header(context ={ })
-      return '' unless (User.current.allowed_to?(:view_rates, context[:project]) || User.current.admin?)
-      return "<th>#{l(:label_rate)}</td>"
+    def view_projects_settings_members_table_header(context = {})
+      if context[:project].module_enabled?(:rate) \
+        and User.current.allowed_to?(:edit_rates, context[:project]) || User.current.admin?
+        "<th>#{l(:label_rate)}</td>"
+      else
+        ""
+      end
     end
 
     def model_project_copy_before_save(context = {})

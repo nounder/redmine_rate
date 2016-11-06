@@ -1,11 +1,13 @@
-<% if member.user %>
-<td id="rate_<%= member.project.id %>_<%= member.user.id %>">
+<% if member.project.module_enabled?(:rate) \
+   and User.current.allowed_to?(:edit_rates, member.project) || User.current.admin? %>
+  <% if member.user %>
+    <td id="rate_<%= member.project.id %>_<%= member.user.id %>">
+    <% rate = Rate.for(member.user, member.project) %>
 
-  <% rate = Rate.for(member.user, member.project) %>
-
-  <%= link_to(rate ? number_to_currency(rate.amount) : l(:label_new),
-      new_user_rate_path(member.user, project_id: member.project_id), remote: true) %>
-</td>
-<% else %>
-<td></td>
+    <%= link_to(rate ? number_to_currency(rate.amount) : l(:label_new),
+        new_user_rate_path(member.user, project_id: member.project_id), remote: true) %>
+    </td>
+  <% else %>
+    <td></td>
+  <% end %>
 <% end %>
