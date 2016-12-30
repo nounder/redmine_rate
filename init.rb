@@ -6,7 +6,7 @@ Redmine::Plugin.register :redmine_rate do
   url 'https://github.com/rgtk/redmine_rate'
   author_url 'https://github.com/rgtk'
   description "Keep track not only on time but also money."
-  version '0.8.0'
+  version '0.9.0'
 
   requires_redmine version_or_higher: '2.3.0'
 
