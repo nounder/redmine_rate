@@ -1,0 +1,8 @@
+0.9.0 (2016-12-30)
+
+ - [Feature] Access to see users' rates in their profile ("Rates" link).
+ - [Feature] Dedicated global view for rates management.
+
+0.8.0 (2016-10-19)
+
+Initial public release.
