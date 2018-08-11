@@ -22,7 +22,7 @@
     <th><%= l(:label_date) %></th>
     <th><%= l(:label_project) %></th>
     <th><%= l(:label_rate) %></th>
-    <% if editable? %><th></th><% end %>
+    <% if rate_editable? %><th></th><% end %>
   </thead>
   <tbody>
     <% @rates.each do |rate| %>

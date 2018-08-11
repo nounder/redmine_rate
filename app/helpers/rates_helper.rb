@@ -12,7 +12,7 @@ module RatesHelper
                options_for_select(options, rate.project.try(:id).to_s))
   end
 
-  def editable?
+  def rate_editable?
     User.current.admin?
   end
 end
